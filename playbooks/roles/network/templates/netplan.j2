@@ -1,0 +1,12 @@
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses:
+        - {{ network_static_ip }}/24
+      routes:
+        - to: default
+          via: {{ network_gateway }}
+      nameservers:
+        addresses: {{ network_nameservers }}

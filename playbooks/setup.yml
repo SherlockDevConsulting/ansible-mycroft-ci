@@ -1,0 +1,15 @@
+- name: Setup DevOps Server
+  hosts: devops
+  become: yes  # Exécuter en sudo
+
+  pre_tasks:
+    - name: Load global variables
+      include_vars: ../../group_vars/all.yml
+
+    - name: Debug default_packages
+      debug:
+        var: default_packages
+
+  roles:
+    - common
+    - network
