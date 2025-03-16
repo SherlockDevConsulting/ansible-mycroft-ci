@@ -1,5 +1,6 @@
 # General variables
 ansible_python_interpreter: /usr/bin/python3
+ansible_user: sherlock
 
 # Config network
 network_static_ip: "192.168.1.100"

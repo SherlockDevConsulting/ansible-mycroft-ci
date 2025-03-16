@@ -5,7 +5,18 @@
     autoremove: yes
     autoclean: yes
 
+- name: Allow user {{ ansible_user }} to use sudo without password
+  lineinfile:
+    path: /etc/sudoers.d/{{ ansible_user }}
+    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL"
+    create: yes
+    mode: '0440'
+    validate: "visudo -cf %s"
+
+
 - name: Install essential packages
   apt:
     name: "{{ default_packages }}"
     state: present
+
+
