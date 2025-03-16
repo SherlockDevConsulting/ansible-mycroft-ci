@@ -4,5 +4,5 @@
     dest: /etc/netplan/50-cloud-init.yaml
   notify: Apply Netplan
 
-- name: Ensure netplan is applied
-  command: sudo netplan apply
+# - name: Ensure netplan is applied # -> in handler
+#   command: sudo netplan apply

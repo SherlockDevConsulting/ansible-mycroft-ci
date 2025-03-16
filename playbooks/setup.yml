@@ -6,7 +6,7 @@
     - name: Load global variables
       include_vars: ../group_vars/all.yml
 
-    - name: Debug default_packages
+    - name: Debug default_packages # TODO remove
       debug:
         var: default_packages
 
