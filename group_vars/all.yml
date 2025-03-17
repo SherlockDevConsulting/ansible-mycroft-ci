@@ -1,6 +1,7 @@
 # General variables
 ansible_python_interpreter: /usr/bin/python3
 ansible_user: sherlock
+maintainer: sherlock
 
 # Config network
 network_static_ip: "192.168.1.100"
@@ -17,3 +18,20 @@ default_packages:
   - unzip
   - python3-pip
   - net-tools
+
+# Gitea
+gitea_version: "1.23.5"
+gitea_container_name: "gitea"
+gitea_ports:
+  - "3000:3000"
+  - "222:22"
+
+# Postgres for Gitea
+gitea_db_type: "postgres"
+gitea_db_host: "db:5432"
+gitea_db_name: "gitea"
+gitea_db_user: "gitea"
+postgres_version: "17"
+# Include secrets
+gitea_db_password: "{{ lookup('vars', 'gitea_db_password') }}" # in file secrets.yml
+
