@@ -26,12 +26,24 @@ gitea_ports:
   - "3000:3000"
   - "222:22"
 
+# Postgres
+postgres_version: "17"
+
 # Postgres for Gitea
 gitea_db_type: "postgres"
 gitea_db_host: "db:5432"
 gitea_db_name: "gitea"
 gitea_db_user: "gitea"
-postgres_version: "17"
+
 # Include secrets
 gitea_db_password: "{{ lookup('vars', 'gitea_db_password') }}" # in file secrets.yml
+
+# SonarQube
+sonarqube_version: "9.9.3-community"
+
+# Postgres for SonarQube
+sonarqube_db_user: "sonarqube"
+sonarqube_db_password: "{{ lookup('vars', 'sonarqube_db_password') }}"
+
+
 

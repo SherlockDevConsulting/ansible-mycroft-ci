@@ -16,3 +16,4 @@
     - docker
     - network
     - gitea
+    - sonarqube

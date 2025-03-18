@@ -1,0 +1,20 @@
+- name: Vérify Docker and Docker compose are installed
+  command: docker --version
+  register: docker_check
+  changed_when: false
+
+- name: Deploy SonarQube with Docker Compose
+  command:
+    cmd: docker compose -f /opt/sonarqube/docker-compose.yml up -d
+  args:
+    chdir: /opt/sonarqube
+
+- name: Vérifier que SonarQube est bien accessible
+  uri:
+    url: "http://{{ network_static_ip }}:9000"
+    method: GET
+    status_code: 200
+  register: sonarqube_status
+  until: sonarqube_status.status == 200
+  retries: 20
+  delay: 10
