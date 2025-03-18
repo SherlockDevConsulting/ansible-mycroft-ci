@@ -1,4 +1,4 @@
-- name: Copy le fichier `docker-compose.yml.j2` sur le serveur
+- name: Copy the file `docker-compose.yml.j2` on the server
   template:
     src: templates/docker-compose.yml.j2
     dest: /opt/docker-compose.yml
@@ -6,12 +6,12 @@
     group: docker
     mode: "0644"
 
-- name: Vérifier si Docker est installé
+- name: Check if docker is installed
   command: docker --version
   register: docker_check
   changed_when: false
 
-- name: Démarrer les services avec Docker Compose
+- name: Start all services with docker compose
   command:
     cmd: docker compose -f /opt/docker-compose.yml up -d
   args:

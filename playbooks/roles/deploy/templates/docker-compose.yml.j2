@@ -103,6 +103,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: always
+    user: root
+    networks:
+      - devops_net
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      JENKINS_OPTS: "--prefix=/jenkins"
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 
 volumes:
   gitea_data:
@@ -111,3 +134,4 @@ volumes:
   sonarqube_data:
   sonarqube_logs:
   sonarqube_db:
+  jenkins_home:

@@ -45,5 +45,11 @@ sonarqube_version: "9.9.3-community"
 sonarqube_db_user: "sonarqube"
 sonarqube_db_password: "{{ lookup('vars', 'sonarqube_db_password') }}"
 
+# Jenkins
+jenkins_version: "lts"
+jenkins_admin_user: "admin"
+jenkins_admin_password: "{{ lookup('vars', 'jenkins_admin_password') }}"
+
+
 
 
