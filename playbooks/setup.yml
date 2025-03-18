@@ -13,7 +13,6 @@
 
   roles:
     - common
-    - docker
     - network
-    - gitea
-    - sonarqube
+    - docker
+    - deploy

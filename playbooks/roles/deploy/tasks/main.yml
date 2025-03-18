@@ -1,0 +1,18 @@
+- name: Copy le fichier `docker-compose.yml.j2` sur le serveur
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/docker-compose.yml
+    owner: "{{ ansible_user }}"
+    group: docker
+    mode: "0644"
+
+- name: Vérifier si Docker est installé
+  command: docker --version
+  register: docker_check
+  changed_when: false
+
+- name: Démarrer les services avec Docker Compose
+  command:
+    cmd: docker compose -f /opt/docker-compose.yml up -d
+  args:
+    chdir: /opt
