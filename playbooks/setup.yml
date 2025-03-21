@@ -2,16 +2,20 @@
   hosts: devops
   become: yes  # Exécuter en sudo
 
-  pre_tasks:
-    - name: Load global variables
-      include_vars: ../group_vars/all.yml
+  vars_files:
+    - ../inventories/group_vars/secrets.yml
 
-    - name: Load secrets
-      include_vars:
-        file: group_vars/secrets.yml
+  # pre_tasks:
+  #   # - name: Load global variables
+  #   #   include_vars: group_vars/all.yml
+
+  #   - name: Load secrets
+  #     include_vars:
+  #       file: group_vars/secrets.yml
 
 
   roles:
+    - debug
     - common
     - network
     - docker

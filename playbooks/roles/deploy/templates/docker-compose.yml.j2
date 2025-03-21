@@ -1,8 +1,5 @@
-networks:
-  devops_net:
-    external: false
-
 services:
+  # --------- GITEA ---------
   gitea:
     image: gitea/gitea:{{ gitea_version }}
     container_name: {{ gitea_container_name }}
@@ -12,8 +9,8 @@ services:
       - "version={{ gitea_version }}"
       - "environment=production"
     environment:
-      - USER_UID=1000
-      - USER_GID=1000
+      - USER_UID={{ gitea_user_uid }}
+      - USER_GID={{ gitea_user_gid }}
       - GITEA__database__DB_TYPE={{ gitea_db_type }}
       - GITEA__database__HOST={{ gitea_db_host }}
       - GITEA__database__NAME={{ gitea_db_name }}
@@ -28,25 +25,26 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      {% for port in gitea_ports %}
-      - "{{ port }}"
-      {% endfor %}
+      - "{{ gitea_http_port }}"
+      - "{{ gitea_ssh_port }}"
     depends_on:
       db-gitea:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "curl", "-f", "http://localhost:{{ gitea_http_port.split(':')[1] }}"]
       interval: 30s
       timeout: 10s
       retries: 5
 
+  # --------- GITEA DB ---------
   db-gitea:
-    image: docker.io/library/postgres:{{ postgres_version }}
+    image: docker.io/library/postgres:{{ gitea_db_version }}
+    container_name: {{ gitea_db_container_name }}
     labels:
       - "project=gitea"
       - "service=postgres"
-      - "version={{ postgres_version }}"
-      - "maintainer={{ maintainer}}"
+      - "version={{ gitea_db_version }}"
+      - "maintainer={{ maintainer }}"
     restart: always
     environment:
       - POSTGRES_USER={{ gitea_db_user }}
@@ -62,14 +60,20 @@ services:
       timeout: 5s
       retries: 5
 
+  # --------- SONARQUBE ---------
   sonarqube:
     image: sonarqube:{{ sonarqube_version }}
-    container_name: sonarqube
+    container_name: {{ sonarqube_container_name }}
+    labels:
+      - "project=sonarqube"
+      - "service=sonarqube"
+      - "version={{ sonarqube_version }}"
+      - "maintainer={{ maintainer }}"
     restart: always
     networks:
       - devops_net
     ports:
-      - "9000:9000"
+      - "{{ sonarqube_http_port }}"
     environment:
       SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonarqube
       SONAR_JDBC_USERNAME: "{{ sonarqube_db_user }}"
@@ -81,14 +85,20 @@ services:
       sonarqube-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000"]
+      test: ["CMD", "curl", "-f", "http://localhost:{{ sonarqube_http_port.split(':')[1] }}"]
       interval: 30s
       timeout: 10s
       retries: 5
 
+  # --------- SONARQUBE DB ---------
   sonarqube-db:
-    image: postgres:{{ postgres_version }}
-    container_name: sonarqube-db
+    image: postgres:{{ sonarqube_db_version }}
+    container_name: {{ sonarqube_db_container_name }}
+    labels:
+      - "maintainer={{ maintainer }}"
+      - "service=sonarqube-db"
+      - "version={{ sonarqube_db_version }}"
+      - "environment=production"
     restart: always
     networks:
       - devops_net
@@ -104,28 +114,60 @@ services:
       timeout: 5s
       retries: 5
   
+  # --------- JENKINS ---------
   jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
+    image: jenkins/jenkins:{{ jenkins_version }}
+    container_name: {{ jenkins_container_name }}
+    labels:
+      - "maintainer={{ maintainer }}"
+      - "service=jenkins"
+      - "version={{ jenkins_version }}"
+      - "environment=production"
     restart: always
     user: root
     networks:
       - devops_net
     ports:
-      - "8080:8080"
-      - "50000:50000"
+      - "{{ jenkins_http_port }}"
+      - "{{ jenkins_agent_port }}"
     environment:
-      JENKINS_OPTS: "--prefix=/jenkins"
-      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+      JENKINS_OPTS: "{{ jenkins_opts }}"
+      JAVA_OPTS: "{{ jenkins_java_opts }}"
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD", "curl", "-f", "http://localhost:{{ jenkins_http_port.split(':')[1] }}"]
       interval: 30s
       timeout: 10s
       retries: 5
 
+  # --------- DOCKER REGISTRY ---------
+  docker-registry:
+    image: registry:{{ registry_version }}
+    container_name: {{ registry_container_name }}
+    labels:
+      - "maintainer={{ maintainer }}"
+      - "service=docker-registry"
+      - "version={{ registry_version }}"
+      - "environment=production"
+    restart: always
+    networks:
+      - devops_net
+    ports:
+      - "{{ docker_registry_port }}"
+    volumes:
+      - docker_registry_data:/var/lib/registry
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:{{ docker_registry_port.split(':')[1] }}/v2/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+networks:
+  devops_net:
+    external: false
 
 volumes:
   gitea_data:
@@ -135,3 +177,4 @@ volumes:
   sonarqube_logs:
   sonarqube_db:
   jenkins_home:
+  docker_registry_data:

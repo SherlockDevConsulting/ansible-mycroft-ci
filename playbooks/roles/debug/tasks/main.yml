@@ -1,0 +1,11 @@
+- name: Afficher les variables de group_vars/all.yml
+  debug:
+    var: default_packages
+
+- name: Afficher les variables de secrets.yml
+  debug:
+    var: harbor_admin_password
+
+- name: Afficher une variable custom (ex gitea_container_name)
+  debug:
+    var: gitea_container_name

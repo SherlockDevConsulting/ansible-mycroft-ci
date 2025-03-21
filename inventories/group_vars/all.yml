@@ -1,0 +1,60 @@
+maintainer: sherlock
+ansible_user: sherlock
+
+# Ports
+gitea_http_port: "3000:3000"  # HTTP Web interface
+gitea_ssh_port: "222:22"      # SSH for git push/pull
+sonarqube_http_port: "9000:9000"  # Web interface SonarQube
+jenkins_http_port: "8080:8080"    # Web interface Jenkins
+jenkins_agent_port: "50000:50000" # Jenkins Agent Communication
+docker_registry_port: "5000:5000" # Docker registry API
+
+# Gitea
+gitea_version: "1.23.5"
+gitea_container_name: "gitea"
+gitea_user_uid: 1000
+gitea_user_gid: 1000
+gitea_db_type: "postgres"
+gitea_db_host: "db-gitea:5432"
+gitea_db_name: "gitea"
+gitea_db_user: "gitea"
+gitea_db_password: "{{ lookup('vars', 'gitea_db_password') }}" # in file secrets.yml
+gitea_db_version: "17"
+gitea_db_container_name: db-gitea
+
+# SonarQube
+sonarqube_version: "10-community"
+sonarqube_container_name: "sonarqube"
+sonarqube_db_container_name: "sonarqube-db"
+sonarqube_db_version: "17"
+sonarqube_db_user: "sonar"
+sonarqube_db_password: "{{ lookup('vars', 'sonarqube_db_password') }}"
+
+# Jenkins
+jenkins_version: "latest-jdk21"
+jenkins_container_name: "jenkins"
+jenkins_opts: "--prefix=/jenkins"     # URL prefix for Jenkins
+jenkins_java_opts: "-Djenkins.install.runSetupWizard=false"  # Disable setup wizard
+
+# Registry
+registry_version: "2.8"
+registry_container_name: "docker-registry"
+
+# Postgres (shared)
+postgres_version: "17"
+
+# Config network
+network_static_ip: "192.168.1.100"
+network_gateway: "192.168.1.1"
+network_nameservers:
+  - "8.8.8.8"
+  - "1.1.1.1"
+
+# List of packages to install
+default_packages:
+  - git
+  - curl
+  - vim
+  - unzip
+  - python3-pip
+  - net-tools
